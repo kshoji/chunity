@@ -483,6 +483,26 @@ mergeInto(LibraryManager.library, {
         
         return true;
     },
+    startListeningForNamedChuckEvent: function( chuckID, name, callback )
+    {
+        (function( c, n ) {
+            var callbackID = theChuck.startListeningForEvent( UTF8ToString( name ), function() {
+                dynCall( 'vi', c, [n] );
+            });
+            this.stopIDs[ c ] = callbackID;
+        })(callback, name);
+        return true;
+    },
+    startListeningForChuckEventWithID: function( chuckID, callbackID, name, callback )
+    {
+        (function( c, i ) {
+            var listenerID = theChuck.startListeningForEvent( UTF8ToString( name ), function() {
+                dynCall( 'vi', c, [i] );
+            });
+            this.stopIDs[ c ] = listenerID;
+        })(callback, callbackID);
+        return true;
+    },
     startListeningForChuckEventWithUnityStyleCallback: function( chuckID, name, gameObject, method )
     {
         (function( g, m ) {
@@ -497,6 +517,16 @@ mergeInto(LibraryManager.library, {
         var callbackID = this.stopIDs[ callback ];
         return theChuck.stopListeningForEvent( Pointer_stringify( name ), callbackID );
     },
+    stopListeningForNamedChuckEvent: function( chuckID, name, callback )
+    {
+        var callbackID = this.stopIDs[ callback ];
+        return theChuck.stopListeningForEvent( UTF8ToString( name ), callbackID );
+    },
+    stopListeningForChuckEventWithID: function( chuckID, callbackID, name, callback )
+    {
+        var listenerID = this.stopIDs[ callback ];
+        return theChuck.stopListeningForEvent( UTF8ToString( name ), listenerID );
+    },
     stopListeningForChuckEventWithUnityStyleCallback: function( chuckID, name, gameObject, method )
     {
         var callbackID = this.stopIDs[ Pointer_stringify( gameObject ) + ":::" + Pointer_stringify( method ) ];
@@ -508,6 +538,12 @@ mergeInto(LibraryManager.library, {
     setGlobalIntArray: function( chuckID, name, arrayValues, numValues )
     {
         return theChuck.setIntArray( Pointer_stringify( name ), _cs32ArrayToJSArray( arrayValues, numValues ) );
+    },
+    // WebGL has no separate audio-thread path; alias to the regular setter
+    setGlobalIntArray_AT__deps: ['setGlobalIntArray'],
+    setGlobalIntArray_AT: function( chuckID, name, arrayValues, numValues )
+    {
+        return _setGlobalIntArray( chuckID, name, arrayValues, numValues );
     },
     getGlobalIntArray__deps: ['jsArrayToCS32Array'],
     getGlobalIntArray: function( chuckID, name, callback )
@@ -524,9 +560,50 @@ mergeInto(LibraryManager.library, {
             });
         })(callback);
     },
+    getNamedGlobalIntArray__deps: ['jsArrayToCS32Array'],
+    getNamedGlobalIntArray: function( chuckID, name, callback )
+    {
+        (function( c, n ) {
+            theChuck.getIntArray( n ).then( function( result ) {
+                var nameBufferSize = lengthBytesUTF8( n ) + 1;
+                var nameBuffer = _malloc( nameBufferSize );
+                stringToUTF8( n, nameBuffer, nameBufferSize );
+                var buffer = _malloc( 4 * result.length );
+                _jsArrayToCS32Array( result, buffer );
+                dynCall( 'vfii', c, [nameBuffer, buffer, result.length] );
+                _free( buffer );
+                _free( nameBuffer );
+            });
+        })(callback, UTF8ToString(name));
+    },
+    getGlobalIntArrayWithID__deps: ['jsArrayToCS32Array'],
+    getGlobalIntArrayWithID: function( chuckID, callbackID, name, callback )
+    {
+        (function( c, i ) {
+            theChuck.getIntArray( UTF8ToString( name ) ).then( function( result ) {
+                var buffer = _malloc( 4 * result.length );
+                _jsArrayToCS32Array( result, buffer );
+                dynCall( 'viii', c, [i, buffer, result.length] );
+                _free( buffer );
+            });
+        })(callback, callbackID);
+    },
+    getGlobalIntArrayWithUnityStyleCallback: function( chuckID, name, gameObject, method )
+    {
+        (function( g, m ) {
+            theChuck.getIntArray( UTF8ToString( name ) ).then( function( result ) {
+                unityInstance.SendMessage( g, m, JSON.stringify( { items: result } ) );
+            });
+        })( UTF8ToString( gameObject ), UTF8ToString( method ) );
+    },
     setGlobalIntArrayValue: function( chuckID, name, index, value )
     {
         return theChuck.setIntArrayValue( Pointer_stringify( name ), index, value );
+    },
+    setGlobalIntArrayValue_AT__deps: ['setGlobalIntArrayValue'],
+    setGlobalIntArrayValue_AT: function( chuckID, name, index, value )
+    {
+        return _setGlobalIntArrayValue( chuckID, name, index, value );
     },
     getGlobalIntArrayValue: function( chuckID, name, index, callback )
     {
@@ -535,6 +612,26 @@ mergeInto(LibraryManager.library, {
                 dynCall( 'vi', c, [result] );
             });
         })(callback);
+    },
+    getNamedGlobalIntArrayValue: function( chuckID, name, index, callback )
+    {
+        (function( c, n ) {
+            theChuck.getIntArrayValue( n, index ).then( function( result ) {
+                var bufferSize = lengthBytesUTF8( n ) + 1;
+                var buffer = _malloc( bufferSize );
+                stringToUTF8( n, buffer, bufferSize );
+                dynCall( 'vfi', c, [buffer, result] );
+                _free( buffer );
+            });
+        })(callback, UTF8ToString(name));
+    },
+    getGlobalIntArrayValueWithID: function( chuckID, callbackID, name, index, callback )
+    {
+        (function( c, i ) {
+            theChuck.getIntArrayValue( UTF8ToString( name ), index ).then( function( result ) {
+                dynCall( 'vii', c, [i, result] );
+            });
+        })(callback, callbackID);
     },
     getGlobalIntArrayValueWithUnityStyleCallback: function( chuckID, name, index, gameObject, method )
     {
@@ -556,6 +653,26 @@ mergeInto(LibraryManager.library, {
             });
         })(callback);
     },
+    getNamedGlobalAssociativeIntArrayValue: function( chuckID, name, key, callback )
+    {
+        (function( c, n ) {
+            theChuck.getAssociativeIntArrayValue( n, UTF8ToString( key ) ).then( function( result ) {
+                var bufferSize = lengthBytesUTF8( n ) + 1;
+                var buffer = _malloc( bufferSize );
+                stringToUTF8( n, buffer, bufferSize );
+                dynCall( 'vfi', c, [buffer, result] );
+                _free( buffer );
+            });
+        })(callback, UTF8ToString(name));
+    },
+    getGlobalAssociativeIntArrayValueWithID: function( chuckID, callbackID, name, key, callback )
+    {
+        (function( c, i ) {
+            theChuck.getAssociativeIntArrayValue( UTF8ToString( name ), UTF8ToString( key ) ).then( function( result ) {
+                dynCall( 'vii', c, [i, result] );
+            });
+        })(callback, callbackID);
+    },
     getGlobalAssociativeIntArrayValueWithUnityStyleCallback: function( chuckID, name, key, gameObject, method )
     {
         (function( g, m ) {
@@ -571,6 +688,11 @@ mergeInto(LibraryManager.library, {
     {
         return theChuck.setFloatArray( Pointer_stringify( name ), _cs64FArrayToJSArray( arrayValues, numValues ) );
     },
+    setGlobalFloatArray_AT__deps: ['setGlobalFloatArray'],
+    setGlobalFloatArray_AT: function( chuckID, name, arrayValues, numValues )
+    {
+        return _setGlobalFloatArray( chuckID, name, arrayValues, numValues );
+    },
     getGlobalFloatArray__deps: ['jsArrayToCS64FArray'],
     getGlobalFloatArray: function( chuckID, name, callback )
     {
@@ -585,9 +707,50 @@ mergeInto(LibraryManager.library, {
             });
         })(callback);
     },
+    getNamedGlobalFloatArray__deps: ['jsArrayToCS64FArray'],
+    getNamedGlobalFloatArray: function( chuckID, name, callback )
+    {
+        (function( c, n ) {
+            theChuck.getFloatArray( n ).then( function( result ) {
+                var nameBufferSize = lengthBytesUTF8( n ) + 1;
+                var nameBuffer = _malloc( nameBufferSize );
+                stringToUTF8( n, nameBuffer, nameBufferSize );
+                var buffer = _malloc( 8 * result.length );
+                _jsArrayToCS64FArray( result, buffer );
+                dynCall( 'vfii', c, [nameBuffer, buffer, result.length] );
+                _free( buffer );
+                _free( nameBuffer );
+            });
+        })(callback, UTF8ToString(name));
+    },
+    getGlobalFloatArrayWithID__deps: ['jsArrayToCS64FArray'],
+    getGlobalFloatArrayWithID: function( chuckID, callbackID, name, callback )
+    {
+        (function( c, i ) {
+            theChuck.getFloatArray( UTF8ToString( name ) ).then( function( result ) {
+                var buffer = _malloc( 8 * result.length );
+                _jsArrayToCS64FArray( result, buffer );
+                dynCall( 'viii', c, [i, buffer, result.length] );
+                _free( buffer );
+            });
+        })(callback, callbackID);
+    },
+    getGlobalFloatArrayWithUnityStyleCallback: function( chuckID, name, gameObject, method )
+    {
+        (function( g, m ) {
+            theChuck.getFloatArray( UTF8ToString( name ) ).then( function( result ) {
+                unityInstance.SendMessage( g, m, JSON.stringify( { items: result } ) );
+            });
+        })( UTF8ToString( gameObject ), UTF8ToString( method ) );
+    },
     setGlobalFloatArrayValue: function( chuckID, name, index, value )
     {
         return theChuck.setFloatArrayValue( Pointer_stringify( name ), index, value );
+    },
+    setGlobalFloatArrayValue_AT__deps: ['setGlobalFloatArrayValue'],
+    setGlobalFloatArrayValue_AT: function( chuckID, name, index, value )
+    {
+        return _setGlobalFloatArrayValue( chuckID, name, index, value );
     },
     getGlobalFloatArrayValue: function( chuckID, name, index, callback )
     {
@@ -596,6 +759,26 @@ mergeInto(LibraryManager.library, {
                 dynCall( 'vf', c, [result] );
             });
         })(callback);
+    },
+    getNamedGlobalFloatArrayValue: function( chuckID, name, index, callback )
+    {
+        (function( c, n ) {
+            theChuck.getFloatArrayValue( n, index ).then( function( result ) {
+                var bufferSize = lengthBytesUTF8( n ) + 1;
+                var buffer = _malloc( bufferSize );
+                stringToUTF8( n, buffer, bufferSize );
+                dynCall( 'vff', c, [buffer, result] );
+                _free( buffer );
+            });
+        })(callback, UTF8ToString(name));
+    },
+    getGlobalFloatArrayValueWithID: function( chuckID, callbackID, name, index, callback )
+    {
+        (function( c, i ) {
+            theChuck.getFloatArrayValue( UTF8ToString( name ), index ).then( function( result ) {
+                dynCall( 'vif', c, [i, result] );
+            });
+        })(callback, callbackID);
     },
     getGlobalFloatArrayValueWithUnityStyleCallback: function( chuckID, name, index, gameObject, method )
     {
@@ -616,6 +799,26 @@ mergeInto(LibraryManager.library, {
                 dynCall( 'vf', c, [result] );
             });
         })(callback);
+    },
+    getNamedGlobalAssociativeFloatArrayValue: function( chuckID, name, key, callback )
+    {
+        (function( c, n ) {
+            theChuck.getAssociativeFloatArrayValue( n, UTF8ToString( key ) ).then( function( result ) {
+                var bufferSize = lengthBytesUTF8( n ) + 1;
+                var buffer = _malloc( bufferSize );
+                stringToUTF8( n, buffer, bufferSize );
+                dynCall( 'vff', c, [buffer, result] );
+                _free( buffer );
+            });
+        })(callback, UTF8ToString(name));
+    },
+    getGlobalAssociativeFloatArrayValueWithID: function( chuckID, callbackID, name, key, callback )
+    {
+        (function( c, i ) {
+            theChuck.getAssociativeFloatArrayValue( UTF8ToString( name ), UTF8ToString( key ) ).then( function( result ) {
+                dynCall( 'vif', c, [i, result] );
+            });
+        })(callback, callbackID);
     },
     getGlobalAssociativeFloatArrayValueWithUnityStyleCallback: function( chuckID, name, key, gameObject, method )
     {
