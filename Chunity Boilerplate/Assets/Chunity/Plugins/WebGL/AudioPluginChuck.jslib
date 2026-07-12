@@ -68,7 +68,7 @@ mergeInto(LibraryManager.library, {
     initSubChuckInstance: function( chuckID, subChuckID, dacName )
     {
         var thisSubChuckReady = defer();
-        dacName = Pointer_stringify( dacName );
+        dacName = UTF8ToString( dacName );
         theChuck.runCode( "global Gain " + dacName + " => blackhole; true => " + dacName + ".buffered;" );
         this.subChucks[ subChuckID ] = createASubChuck( theChuck, dacName, thisSubChuckReady );
         this.subChucks[ subChuckID ].connect( audioContext.destination );
@@ -222,27 +222,27 @@ mergeInto(LibraryManager.library, {
     },
     runChuckCode: function( chuckID, code )
     {
-        return theChuck.runCode( Pointer_stringify( code ) );
+        return theChuck.runCode( UTF8ToString( code ) );
     },
     runChuckCodeWithReplacementDac: function( chuckID, code, replacementDac )
     {
-        return theChuck.runCodeWithReplacementDac( Pointer_stringify( code ), Pointer_stringify( replacementDac ) );
+        return theChuck.runCodeWithReplacementDac( UTF8ToString( code ), UTF8ToString( replacementDac ) );
     },
     runChuckFile: function( chuckID, filename ) 
     {
-        return theChuck.runFile( Pointer_stringify( filename ) );
+        return theChuck.runFile( UTF8ToString( filename ) );
     },
     runChuckFileWithReplacementDac: function( chuckID, filename, replacementDac )
     {
-        return theChuck.runFileWithReplacementDac( Pointer_stringify( filename ), Pointer_stringify( replacementDac ) );
+        return theChuck.runFileWithReplacementDac( UTF8ToString( filename ), UTF8ToString( replacementDac ) );
     },
     runChuckFileWithArgs: function( chuckID, filename, args )
     {
-        return theChuck.runFileWithArgs( Pointer_stringify( filename ), Pointer_stringify( args ) );
+        return theChuck.runFileWithArgs( UTF8ToString( filename ), UTF8ToString( args ) );
     },
     runChuckFileWithArgsWithReplacementDac: function( chuckID, filename, args, dacName )
     {
-        return theChuck.runFileWithArgsWithReplacementDac( Pointer_stringify( filename ), Pointer_stringify( args ), Pointer_stringify( dacName ) );
+        return theChuck.runFileWithArgsWithReplacementDac( UTF8ToString( filename ), UTF8ToString( args ), UTF8ToString( dacName ) );
     },
     setChoutCallback: function( chuckID, callback )
     {
@@ -271,12 +271,12 @@ mergeInto(LibraryManager.library, {
 
     setChuckInt: function( chuckID, name, val )
     {
-        return theChuck.setInt( Pointer_stringify( name ), val );
+        return theChuck.setInt( UTF8ToString( name ), val );
     },
     getChuckInt: function( chuckID, name, callback )
     {
         (function( c ) {
-            theChuck.getInt( Pointer_stringify( name ) ).then( function( result )
+            theChuck.getInt( UTF8ToString( name ) ).then( function( result )
             {
                 dynCall( 'vi', c, [result] );
             });
@@ -296,12 +296,12 @@ mergeInto(LibraryManager.library, {
                 // be nice to memory
                 _free( buffer );
             });
-        })(callback, Pointer_stringify(name));
+        })(callback, UTF8ToString(name));
     },
     getChuckIntWithID: function( chuckID, callbackID, name, callback )
     {
         (function( c, i ) {
-            theChuck.getInt( Pointer_stringify( name ) ).then( function( result )
+            theChuck.getInt( UTF8ToString( name ) ).then( function( result )
             {
                 dynCall( 'vii', c, [i, result] );
             });
@@ -310,20 +310,20 @@ mergeInto(LibraryManager.library, {
     getChuckIntWithUnityStyleCallback: function( chuckID, name, gameObject, method )
     {
         (function( g, m ) {
-            theChuck.getInt( Pointer_stringify( name ) ).then( function( result )
+            theChuck.getInt( UTF8ToString( name ) ).then( function( result )
             {
                 unityInstance.SendMessage( g, m, result );
             });
-        })( Pointer_stringify( gameObject ), Pointer_stringify( method ) );
+        })( UTF8ToString( gameObject ), UTF8ToString( method ) );
     },
     setChuckFloat: function( chuckID, name, val )
     {
-        return theChuck.setFloat( Pointer_stringify( name ), val );
+        return theChuck.setFloat( UTF8ToString( name ), val );
     },
     getChuckFloat: function( chuckID, name, callback )
     {
         (function( c ) {
-            theChuck.getFloat( Pointer_stringify( name ) ).then( function( result )
+            theChuck.getFloat( UTF8ToString( name ) ).then( function( result )
             {
                 dynCall( 'vf', c, [result] );
             });
@@ -343,12 +343,12 @@ mergeInto(LibraryManager.library, {
                 // be nice to memory
                 _free( buffer );
             });
-        })(callback, Pointer_stringify(name)); 
+        })(callback, UTF8ToString(name)); 
     },
     getChuckFloatWithID: function( chuckID, callbackID, name, callback )
     {
         (function( c, i ) {
-            theChuck.getFloat( Pointer_stringify( name ) ).then( function( result )
+            theChuck.getFloat( UTF8ToString( name ) ).then( function( result )
             {
                 dynCall( 'vif', c, [i, result] );
             });
@@ -357,20 +357,20 @@ mergeInto(LibraryManager.library, {
     getChuckFloatWithUnityStyleCallback: function( chuckID, name, gameObject, method )
     {
         (function( g, m ) {
-            theChuck.getFloat( Pointer_stringify( name ) ).then( function( result )
+            theChuck.getFloat( UTF8ToString( name ) ).then( function( result )
             {
                 unityInstance.SendMessage( g, m, result );
             });
-        })( Pointer_stringify( gameObject ), Pointer_stringify( method ) );
+        })( UTF8ToString( gameObject ), UTF8ToString( method ) );
     },
     setChuckString: function( chuckID, name, val )
     {
-        return theChuck.setString( Pointer_stringify( name ), Pointer_stringify( val ) );
+        return theChuck.setString( UTF8ToString( name ), UTF8ToString( val ) );
     },
     getChuckString: function( chuckID, name, callback )
     {
         (function( c ) {
-            theChuck.getString( Pointer_stringify( name ) ).then( function( result ) {
+            theChuck.getString( UTF8ToString( name ) ).then( function( result ) {
                 // need to turn JS result string into Module heap string.
                 var bufferSize = lengthBytesUTF8( result ) + 1;
                 var buffer = _malloc( bufferSize );
@@ -402,12 +402,12 @@ mergeInto(LibraryManager.library, {
                 _free( buffer );
                 _free( nameBuffer );
             });
-        })(callback, Pointer_stringify(name));
+        })(callback, UTF8ToString(name));
     },
     getChuckStringWithID: function( chuckID, callbackID, name, callback )
     {
         (function( c, i ) {
-            theChuck.getString( Pointer_stringify( name ) ).then( function( result ) {
+            theChuck.getString( UTF8ToString( name ) ).then( function( result ) {
                 // need to turn JS result string into Module heap string.
                 var bufferSize = lengthBytesUTF8( result ) + 1;
                 var buffer = _malloc( bufferSize );
@@ -422,24 +422,24 @@ mergeInto(LibraryManager.library, {
     getChuckStringWithUnityStyleCallback: function( chuckID, name, gameObject, method )
     {
         (function( g, m ) {
-            theChuck.getString( Pointer_stringify( name ) ).then( function( result )
+            theChuck.getString( UTF8ToString( name ) ).then( function( result )
             {
                 unityInstance.SendMessage( g, m, result );
             });
-        })( Pointer_stringify( gameObject ), Pointer_stringify( method ) );
+        })( UTF8ToString( gameObject ), UTF8ToString( method ) );
     },
     signalChuckEvent: function( chuckID, name )
     {
-        return theChuck.signalEvent( Pointer_stringify( name ) );
+        return theChuck.signalEvent( UTF8ToString( name ) );
     },
     broadcastChuckEvent: function( chuckID, name )
     {
-        return theChuck.broadcastEvent( Pointer_stringify( name ) );
+        return theChuck.broadcastEvent( UTF8ToString( name ) );
     },
     listenForChuckEventOnce: function( chuckID, name, callback )
     {
         (function( c ) {
-            theChuck.listenForEventOnce( Pointer_stringify( name ), function() {
+            theChuck.listenForEventOnce( UTF8ToString( name ), function() {
                 dynCall( 'v', c, 0 );
             });
         })(callback);
@@ -448,7 +448,7 @@ mergeInto(LibraryManager.library, {
     listenForNamedChuckEventOnce: function( chuckID, name, callback )
     {
         (function( c, n ) {
-            theChuck.listenForEventOnce( Pointer_stringify( name ), function() {
+            theChuck.listenForEventOnce( UTF8ToString( name ), function() {
                 dynCall( 'vi', c, [n] );
             });
         })(callback, name);
@@ -457,7 +457,7 @@ mergeInto(LibraryManager.library, {
     listenForChuckEventOnceWithID: function( chuckID, callbackID, name, callback )
     {
         (function( c, i ) {
-            theChuck.listenForEventOnce( Pointer_stringify( name ), function() {
+            theChuck.listenForEventOnce( UTF8ToString( name ), function() {
                 dynCall( 'vi', c, [i] );
             });
         })(callback, callbackID);
@@ -466,16 +466,16 @@ mergeInto(LibraryManager.library, {
     listenForChuckEventOnceWithUnityStyleCallback: function( chuckID, name, gameObject, method )
     {
         (function( g, m ) {
-            theChuck.listenForEventOnce( Pointer_stringify( name ), function()
+            theChuck.listenForEventOnce( UTF8ToString( name ), function()
             {
                 unityInstance.SendMessage( g, m );
             });
-        })( Pointer_stringify( gameObject ), Pointer_stringify( method ) );
+        })( UTF8ToString( gameObject ), UTF8ToString( method ) );
     },
     startListeningForChuckEvent: function( chuckID, name, callback )
     {
         (function( c ) {
-            var callbackID = theChuck.startListeningForEvent( Pointer_stringify( name ), function() {
+            var callbackID = theChuck.startListeningForEvent( UTF8ToString( name ), function() {
                 dynCall( 'v', c, 0 );
             });
             this.stopIDs[ c ] = callbackID;
@@ -506,16 +506,16 @@ mergeInto(LibraryManager.library, {
     startListeningForChuckEventWithUnityStyleCallback: function( chuckID, name, gameObject, method )
     {
         (function( g, m ) {
-            var callbackID = theChuck.startListeningForEvent( Pointer_stringify( name ), function() {
+            var callbackID = theChuck.startListeningForEvent( UTF8ToString( name ), function() {
                 unityInstance.SendMessage( g, m );
             });
             this.stopIDs[ g + ":::" + m ] = callbackID;
-        })( Pointer_stringify( gameObject ), Pointer_stringify( method ) );
+        })( UTF8ToString( gameObject ), UTF8ToString( method ) );
     },
     stopListeningForChuckEvent: function( chuckID, name, callback )
     {
         var callbackID = this.stopIDs[ callback ];
-        return theChuck.stopListeningForEvent( Pointer_stringify( name ), callbackID );
+        return theChuck.stopListeningForEvent( UTF8ToString( name ), callbackID );
     },
     stopListeningForNamedChuckEvent: function( chuckID, name, callback )
     {
@@ -529,15 +529,15 @@ mergeInto(LibraryManager.library, {
     },
     stopListeningForChuckEventWithUnityStyleCallback: function( chuckID, name, gameObject, method )
     {
-        var callbackID = this.stopIDs[ Pointer_stringify( gameObject ) + ":::" + Pointer_stringify( method ) ];
-        theChuck.stopListeningForEvent( Pointer_stringify( name ), callbackID );
+        var callbackID = this.stopIDs[ UTF8ToString( gameObject ) + ":::" + UTF8ToString( method ) ];
+        theChuck.stopListeningForEvent( UTF8ToString( name ), callbackID );
     },
 
     // note: array is what Unity thinks is CKINT, which is 32 bit
     setGlobalIntArray__deps: ['cs32ArrayToJSArray'],
     setGlobalIntArray: function( chuckID, name, arrayValues, numValues )
     {
-        return theChuck.setIntArray( Pointer_stringify( name ), _cs32ArrayToJSArray( arrayValues, numValues ) );
+        return theChuck.setIntArray( UTF8ToString( name ), _cs32ArrayToJSArray( arrayValues, numValues ) );
     },
     // WebGL has no separate audio-thread path; alias to the regular setter
     setGlobalIntArray_AT__deps: ['setGlobalIntArray'],
@@ -549,7 +549,7 @@ mergeInto(LibraryManager.library, {
     getGlobalIntArray: function( chuckID, name, callback )
     {
         (function( c ) {
-            theChuck.getIntArray( Pointer_stringify( name ) ).then( function( result ) {
+            theChuck.getIntArray( UTF8ToString( name ) ).then( function( result ) {
                 console.log( "JS thinks the GET int array is ", result );
                 // need to malloc space for the array on the heap
                 // assuming 32 bit ints, since that's what unity thinks is an int size!
@@ -598,7 +598,7 @@ mergeInto(LibraryManager.library, {
     },
     setGlobalIntArrayValue: function( chuckID, name, index, value )
     {
-        return theChuck.setIntArrayValue( Pointer_stringify( name ), index, value );
+        return theChuck.setIntArrayValue( UTF8ToString( name ), index, value );
     },
     setGlobalIntArrayValue_AT__deps: ['setGlobalIntArrayValue'],
     setGlobalIntArrayValue_AT: function( chuckID, name, index, value )
@@ -608,7 +608,7 @@ mergeInto(LibraryManager.library, {
     getGlobalIntArrayValue: function( chuckID, name, index, callback )
     {
         (function( c ) {
-            theChuck.getIntArrayValue( Pointer_stringify( name ), index ).then( function( result ) {
+            theChuck.getIntArrayValue( UTF8ToString( name ), index ).then( function( result ) {
                 dynCall( 'vi', c, [result] );
             });
         })(callback);
@@ -636,19 +636,19 @@ mergeInto(LibraryManager.library, {
     getGlobalIntArrayValueWithUnityStyleCallback: function( chuckID, name, index, gameObject, method )
     {
         (function( g, m ) {
-            theChuck.getIntArrayValue( Pointer_stringify( name ), index ).then( function( result ) {
+            theChuck.getIntArrayValue( UTF8ToString( name ), index ).then( function( result ) {
                 unityInstance.SendMessage( g, m, result );
             });
-        })( Pointer_stringify( gameObject ), Pointer_stringify( method ) );
+        })( UTF8ToString( gameObject ), UTF8ToString( method ) );
     },
     setGlobalAssociativeIntArrayValue: function( chuckID, name, key, value )
     {
-        return theChuck.setAssociativeIntArrayValue( Pointer_stringify( name ), Pointer_stringify( key ), value );
+        return theChuck.setAssociativeIntArrayValue( UTF8ToString( name ), UTF8ToString( key ), value );
     },
     getGlobalAssociativeIntArrayValue: function( chuckID, name, key, callback )
     {
         (function( c ) {
-            theChuck.getAssociativeIntArrayValue( Pointer_stringify( name ), Pointer_stringify( key ) ).then( function( result ) {
+            theChuck.getAssociativeIntArrayValue( UTF8ToString( name ), UTF8ToString( key ) ).then( function( result ) {
                 dynCall( 'vi', c, [result] );
             });
         })(callback);
@@ -676,17 +676,17 @@ mergeInto(LibraryManager.library, {
     getGlobalAssociativeIntArrayValueWithUnityStyleCallback: function( chuckID, name, key, gameObject, method )
     {
         (function( g, m ) {
-            theChuck.getAssociativeIntArrayValue( Pointer_stringify( name ), Pointer_stringify( key ) ).then( function( result ) {
+            theChuck.getAssociativeIntArrayValue( UTF8ToString( name ), UTF8ToString( key ) ).then( function( result ) {
                 unityInstance.SendMessage( g, m, result );
             });
-        })( Pointer_stringify( gameObject ), Pointer_stringify( method ) );
+        })( UTF8ToString( gameObject ), UTF8ToString( method ) );
     },
 
     // note: array is t_CKFLOAT == Float64 since that's what Unity thinks CKFLOAT is
     setGlobalFloatArray__deps: ['cs64FArrayToJSArray'],
     setGlobalFloatArray: function( chuckID, name, arrayValues, numValues )
     {
-        return theChuck.setFloatArray( Pointer_stringify( name ), _cs64FArrayToJSArray( arrayValues, numValues ) );
+        return theChuck.setFloatArray( UTF8ToString( name ), _cs64FArrayToJSArray( arrayValues, numValues ) );
     },
     setGlobalFloatArray_AT__deps: ['setGlobalFloatArray'],
     setGlobalFloatArray_AT: function( chuckID, name, arrayValues, numValues )
@@ -697,7 +697,7 @@ mergeInto(LibraryManager.library, {
     getGlobalFloatArray: function( chuckID, name, callback )
     {
         (function( c ) {
-            theChuck.getFloatArray( Pointer_stringify( name ) ).then( function( result ) {
+            theChuck.getFloatArray( UTF8ToString( name ) ).then( function( result ) {
                 // need to malloc space for the array on the heap
                 // assuming 64 bit floats, since that's what unity thinks is a float size!
                 var buffer = _malloc( 8 * result.length );
@@ -745,7 +745,7 @@ mergeInto(LibraryManager.library, {
     },
     setGlobalFloatArrayValue: function( chuckID, name, index, value )
     {
-        return theChuck.setFloatArrayValue( Pointer_stringify( name ), index, value );
+        return theChuck.setFloatArrayValue( UTF8ToString( name ), index, value );
     },
     setGlobalFloatArrayValue_AT__deps: ['setGlobalFloatArrayValue'],
     setGlobalFloatArrayValue_AT: function( chuckID, name, index, value )
@@ -755,7 +755,7 @@ mergeInto(LibraryManager.library, {
     getGlobalFloatArrayValue: function( chuckID, name, index, callback )
     {
         (function( c ) {
-            theChuck.getFloatArrayValue( Pointer_stringify( name ), index ).then( function( result ) {
+            theChuck.getFloatArrayValue( UTF8ToString( name ), index ).then( function( result ) {
                 dynCall( 'vf', c, [result] );
             });
         })(callback);
@@ -783,19 +783,19 @@ mergeInto(LibraryManager.library, {
     getGlobalFloatArrayValueWithUnityStyleCallback: function( chuckID, name, index, gameObject, method )
     {
         (function( g, m ) {
-            theChuck.getFloatArrayValue( Pointer_stringify( name ), index ).then( function( result ) {
+            theChuck.getFloatArrayValue( UTF8ToString( name ), index ).then( function( result ) {
                 unityInstance.SendMessage( g, m, result );
             });
-        })( Pointer_stringify( gameObject ), Pointer_stringify( method ) );
+        })( UTF8ToString( gameObject ), UTF8ToString( method ) );
     },
     setGlobalAssociativeFloatArrayValue: function( chuckID, name, key, value )
     {
-        return theChuck.setAssociativeFloatArrayValue( Pointer_stringify( name ), Pointer_stringify( key ), value );
+        return theChuck.setAssociativeFloatArrayValue( UTF8ToString( name ), UTF8ToString( key ), value );
     },
     getGlobalAssociativeFloatArrayValue: function( chuckID, name, key, callback )
     {
         (function( c ) {
-            theChuck.getAssociativeFloatArrayValue( Pointer_stringify( name ), Pointer_stringify( key ) ).then( function( result ) {
+            theChuck.getAssociativeFloatArrayValue( UTF8ToString( name ), UTF8ToString( key ) ).then( function( result ) {
                 dynCall( 'vf', c, [result] );
             });
         })(callback);
@@ -823,10 +823,10 @@ mergeInto(LibraryManager.library, {
     getGlobalAssociativeFloatArrayValueWithUnityStyleCallback: function( chuckID, name, key, gameObject, method )
     {
         (function( g, m ) {
-            theChuck.getAssociativeFloatArrayValue( Pointer_stringify( name ), Pointer_stringify( key ) ).then( function( result ) {
+            theChuck.getAssociativeFloatArrayValue( UTF8ToString( name ), UTF8ToString( key ) ).then( function( result ) {
                 unityInstance.SendMessage( g, m, result );
             });
-        })( Pointer_stringify( gameObject ), Pointer_stringify( method ) );
+        })( UTF8ToString( gameObject ), UTF8ToString( method ) );
     }
 
 
