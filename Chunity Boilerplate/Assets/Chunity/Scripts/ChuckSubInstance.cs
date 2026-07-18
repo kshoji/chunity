@@ -1229,6 +1229,28 @@ public class ChuckSubInstance : MonoBehaviour
     #endif
 
 
+    // ----------------------------------------------------
+    // name: OutputUgen
+    // desc: global UGen name used as this Sub's replacement
+    //       DAC (e.g. __dac__N). External drivers can pass
+    //       this to GetUGenSamples.
+    // ----------------------------------------------------
+    public string OutputUgen
+    {
+        get { return myOutputUgen; }
+    }
+
+    // ----------------------------------------------------
+    // name: IsRunning
+    // desc: true after Awake finishes Sub setup; false after
+    //       teardown. Matches the running gate used by
+    //       OnAudioFilterRead.
+    // ----------------------------------------------------
+    public bool IsRunning
+    {
+        get { return running; }
+    }
+
     public string GetUniqueVariableName()
     {
         return chuckMainInstance.GetUniqueVariableName();
