@@ -1105,6 +1105,26 @@ public class ChuckMainInstance : MonoBehaviour
         return hasInit;
     }
 
+    // ----------------------------------------------------
+    // name: GetMicClip
+    // desc: AudioClip started by SetupMic(), or null when
+    //       the microphone is unused / unavailable.
+    // ----------------------------------------------------
+    public AudioClip GetMicClip()
+    {
+        return micClip;
+    }
+
+    // ----------------------------------------------------
+    // name: GetMicDevice
+    // desc: device name passed to Microphone.Start /
+    //       GetPosition (empty string = default device).
+    // ----------------------------------------------------
+    public string GetMicDevice()
+    {
+        return myMicDevice;
+    }
+
     private void SetupMic()
     {
         // default device
