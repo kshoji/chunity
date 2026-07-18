@@ -74,6 +74,17 @@ public class ChuckMainInstance : MonoBehaviour
     private bool clearChuckOnSceneLoad = false;
 
 
+    // ----------------------------------------------------
+    // name: useBuiltInAudioFilter
+    // desc: when true (default), OnAudioFilterRead advances
+    //       this VM. Set false when an external audio driver
+    //       (e.g. Unity Scriptable Audio Generator) owns the
+    //       ManualAudioCallback so FilterRead does not run
+    //       a second time.
+    // ----------------------------------------------------
+    [Tooltip( "Whether OnAudioFilterRead drives this ChucK VM. Set false when an external audio driver advances the VM instead." )]
+    public bool useBuiltInAudioFilter = true;
+
 
 
     // ----------------------------------------------------
@@ -1165,6 +1176,11 @@ public class ChuckMainInstance : MonoBehaviour
     #else
     void OnAudioFilterRead( float[] data, int channels )
     {
+        if( !useBuiltInAudioFilter )
+        {
+            return;
+        }
+
         // check whether channels is correct | added buffer length check (v2.2.0) eito
         if( channels != myNumChannels || data.Length != myOutBuffer.Length )
         {
